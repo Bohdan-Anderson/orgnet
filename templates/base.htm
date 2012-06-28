@@ -1,0 +1,250 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>{% block title %}orgnet{% endblock %}</title>
+	<meta name="description" content="orgnet">
+	<meta name="author" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- ><link rel="stylesheet" href="/static/css/boiler.css">
+
+	<link rel="stylesheet" href="/static/css/fonts.css"> -->
+
+	<link rel="stylesheet" href="/static/css/style.css">
+ <script type="text/javascript" src="/static/js/Three.js"></script>
+ <script type="text/javascript" src="/static/js/rAF.js"></script>
+ <script type="text/javascript" src="/static/dat/dat.gui.min.js"></script>
+ <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+<link href='http://fonts.googleapis.com/css?family=Droid+Sans|Lato|PT+Sans|Ubuntu|Josefin+Sans|Lobster|Raleway:100|Open+Sans' rel='stylesheet' type='text/css'>
+
+    {% block head %} {% endblock %}
+</head>
+<body>
+
+<div id="container">
+    {% block content %}
+
+    {% endblock %}
+</div>
+
+<script>
+var ORGNET = ORGNET || {};
+
+ (function() {
+
+    ORGNET.TEST = new function() {
+
+        var that = {};
+
+        // internal vars
+        var $container = $('#container'),
+
+        renderer = null,
+        scene = null,
+        camera = null,
+
+        callbacks = null,
+        mouseDown = false,
+        lastMouseX = null,
+        lastMouseY = null,
+        angle = 0,
+        phase = 0,
+
+        // set some constants
+        RADIUS = 200,
+        SCALE = 90,
+        DEPTH = 500,
+        WIDTH = $container.width(),
+        HEIGHT = $container.height(),
+        ASPECT = WIDTH / HEIGHT,
+        NEAR = 0.1,
+        FAR = 3000,
+        VIEW_ANGLE = 45;
+
+        obj = {
+            'x': 1,
+            'y': 1,
+            'z': 1
+        };
+
+
+
+        function createGUI() {
+            var gui = new dat.GUI({
+                height: 95
+            });
+            $gui = $('.dg.main');
+            $gui.css({
+                float: 'left',
+                left: 10
+            });
+            gui.add(obj, 'x').step(0.1);
+            gui.add(obj, 'y').step(0.1);
+            gui.add(obj, 'z').step(0.1);
+
+        }
+
+        that.init = function() {
+	
+						var pointData = (0.1, 2.2, 122.3, 55.2, 233.2, 55.2, 88.12, 48.2)
+
+            scene = new THREE.Scene();
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+            camera.position.z = 1000;
+            scene.add(camera);
+
+            geometry = new THREE.CubeGeometry(200, 200, 200);
+            material = new THREE.MeshBasicMaterial({
+                color: 0xff0000,
+                wireframe: true
+            });
+						mesh = new THREE.Mesh(geometry, material);
+						
+						geometry2 = new THREE.Vector3(0,0,0);
+            
+						
+						scene.add(geometry2, material);
+            scene.add(mesh);
+
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            $container.append(renderer.domElement);
+            $container.bind('selectstart', false);
+
+            createGUI();
+            addEventListeners();
+            animate();
+        }
+        /**
+   * Sets up the event listeners so we
+   * can click and drag the cube around
+   */
+        function addEventListeners() {
+
+            /*
+     * Set up the callbacks
+     */
+            callbacks = {
+
+                /**
+       * When the mouse is depressed
+       */
+                onMouseDown: function(event) {
+                    mouseDown = true;
+                    lastMouseX = event.clientX;
+                    lastMouseY = event.clientY;
+                },
+
+                /**
+       * When the mouse has cheered up
+       */
+                onMouseUp: function(event) {
+                    mouseDown = false;
+                },
+
+                /**
+       * When the mouse gets his boogie on
+       */
+                onMouseMove: function(event) {
+
+                    if (mouseDown) {
+                        var thisMouseX = event.clientX;
+                        var thisMouseY = event.clientY;
+
+                        mesh.rotation.y += (thisMouseX - lastMouseX) * 0.01;
+                        mesh.rotation.x += (thisMouseY - lastMouseY) * 0.01;
+
+                        lastMouseY = thisMouseY;
+                        lastMouseX = thisMouseX;
+                    }
+                },
+
+                onWindowResize: function() {
+
+                    width = $container.width();
+                    height = $container.height();
+                    aspect = width / height;
+
+                    renderer.resize(width, height);
+                    camera.projectionMatrix.perspective(VIEW_ANGLE, aspect, NEAR, FAR);
+
+                }
+            }
+
+            $container.mousedown(callbacks.onMouseDown);
+            $container.mouseup(callbacks.onMouseUp);
+            $container.mousemove(callbacks.onMouseMove);
+            $(window).resize(callbacks.onWindowResize);
+
+        }
+
+
+        function animate() {
+            // note: three.js includes requestAnimationFrame shim
+            requestAnimationFrame(animate);
+            render();
+        }
+
+        function render() {
+
+            //mesh.rotation.x += 0.01;
+            //  mesh.rotation.y += 0.02;
+            mesh.geometry.verticesNeedUpdate = true;
+            mesh.scale = {
+                'x': obj['x'],
+                'y': obj['y'],
+                'z': obj['z']
+            }
+            renderer.render(scene, camera);
+
+        }
+		that.init();
+    }
+    
+})();
+ </script>
+
+
+
+<!--<script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-25279571-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+</script> -->
+
+
+
+<!-- <script>
+var get_distance = function(lat1, lat2) {
+	var R = 6371; // km
+	var d = Math.acos(Math.sin(lat1)*Math.sin(lat2) + 
+	                  Math.cos(lat1)*Math.cos(lat2) *
+	                  Math.cos(lon2-lon1)) * R;
+}
+
+</script>-->
+
+	
+<!--[if lt IE 7 ]>
+	<script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.2/CFInstall.min.js"></script>
+	<script>window.attachEvent("onload",function(){CFInstall.check({mode:"overlay"})})</script>
+<![endif]-->
+
+</body>
+</html>
