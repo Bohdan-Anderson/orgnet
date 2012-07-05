@@ -10,10 +10,48 @@ import random
 import difflib
 import datetime
 from django.contrib.auth import authenticate, login
+import gpxpy
+import gpxpy.gpx
+from django.utils import simplejson
+
+# GPS TEST
+# 
+def get_gps_data():
+    gpx_file = open('/Users/anyavassilieva/Sites/orgnet/data/random.gpx', 'r')
+    gpsDict = {}
+    gpsList = []
+    gpx = gpxpy.parse(gpx_file)
+    counter = 0
+    
+    for track in gpx.tracks:
+        for segment in track.segments:
+            for point in segment.points:
+                gpsDict.update({ counter : { 'lat': point.latitude, 'lon':point.longitude }})
+                counter+=1
+                # gpsList.append((point.latitude, point.longitude))
+                # print 'Point at ({0},{1}) -> {2}'.format(point.latitude, point.longitude, point.elevation)
+
+    for waypoint in gpx.waypoints:
+        print 'waypoint {0} -> ({1},{2})'.format(waypoint.name, waypoint.latitude, waypoint.longitude)
+
+    for route in gpx.routes:
+        print 'Route:'
+        for point in route:
+            print 'Point at ({0},{1}) -> {2}'.format(point.latitude, point.longitude, point.elevation)
+
+    #print 'GPX:', gpx.to_xml()
+    jsonData = simplejson.dumps(gpsDict)
+    return jsonData
 
 def home(request, tag=None):
     obj = datetime.datetime.now
-    return render_to_response('home.html', { 'object': obj })
+    gpsdata = get_gps_data()
+    return render_to_response('home.html', { 'object': obj, 'gps' : gpsdata })
+
+def jsonGPS(request):
+    gpsdata = get_gps_data()
+    return HttpResponse(gpsdata, mimetype="application/json")
+
 def test(request):
     obj = 'hello'
     print 'hi'

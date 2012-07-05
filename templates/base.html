@@ -26,191 +26,279 @@
     {% block head %} {% endblock %}
 </head>
 <body>
-
-<div id="container">
     {% block content %}
 
     {% endblock %}
-</div>
+
 
 <script>
-var ORGNET = ORGNET || {};
 
- (function() {
+			var container, stats;
 
-    ORGNET.TEST = new function() {
+			var camera, scene, renderer;
 
-        var that = {};
+			var text, plane;
+			
+			var latMin, latMax, lonMin, lonMax = 0;
+			
+			var gpsLat = [];
+			var gpsLon = [];
+			
+			var targetRotation = 0;
+			var targetRotationOnMouseDown = 0;
 
-        // internal vars
-        var $container = $('#container'),
+			var mouseX = 0;
+			var mouseXOnMouseDown = 0;
 
-        renderer = null,
-        scene = null,
-        camera = null,
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
 
-        callbacks = null,
-        mouseDown = false,
-        lastMouseX = null,
-        lastMouseY = null,
-        angle = 0,
-        phase = 0,
+			init();
+			animate();
 
-        // set some constants
-        RADIUS = 200,
-        SCALE = 90,
-        DEPTH = 500,
-        WIDTH = $container.width(),
-        HEIGHT = $container.height(),
-        ASPECT = WIDTH / HEIGHT,
-        NEAR = 0.1,
-        FAR = 3000,
-        VIEW_ANGLE = 45;
+			function init() {
 
-        obj = {
-            'x': 1,
-            'y': 1,
-            'z': 1
-        };
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
 
+				var info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.innerHTML = 'ORGNET : GPS DATA TEST (drag to spin)';
+				container.appendChild( info );
 
+				scene = new THREE.Scene();
 
-        function createGUI() {
-            var gui = new dat.GUI({
-                height: 95
-            });
-            $gui = $('.dg.main');
-            $gui.css({
-                float: 'left',
-                left: 10
-            });
-            gui.add(obj, 'x').step(0.1);
-            gui.add(obj, 'y').step(0.1);
-            gui.add(obj, 'z').step(0.1);
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 150, 500 );
+				scene.add( camera );
 
-        }
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 0, 1 );
+				scene.add( light );
 
-        that.init = function() {
-	
-						var pointData = (0.1, 2.2, 122.3, 55.2, 233.2, 55.2, 88.12, 48.2)
+				parent = new THREE.Object3D();
+				parent.position.y = 50;
+				scene.add( parent );
 
-            scene = new THREE.Scene();
+				function addGeometry( geometry, points, spacedPoints, color, x, y, z, rx, ry, rz, s ) {
 
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
-            camera.position.z = 1000;
-            scene.add(camera);
+					// // 3d shape
+					// 
+					// 				var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } ) ] );
+					// 				mesh.position.set( x, y, z - 75 );
+					// 				mesh.rotation.set( rx, ry, rz );
+					// 				mesh.scale.set( s, s, s );
+					// 				parent.add( mesh );
+					// 
+					// 				// solid line
+					// 
+					// 				var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, linewidth: 2 } ) );
+					// 				line.position.set( x, y, z + 25 );
+					// 				line.rotation.set( rx, ry, rz );
+					// 				line.scale.set( s, s, s );
+					// 				parent.add( line );
+				
+					// transparent line from real points
 
-            geometry = new THREE.CubeGeometry(200, 200, 200);
-            material = new THREE.MeshBasicMaterial({
-                color: 0xff0000,
-                wireframe: true
-            });
-						mesh = new THREE.Mesh(geometry, material);
-						
-						geometry2 = new THREE.Vector3(0,0,0);
-            
-						
-						scene.add(geometry2, material);
-            scene.add(mesh);
+					var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, opacity: 0.5 } ) );
+					line.position.set( x, y, z + 75 );
+					line.rotation.set( rx, ry, rz );
+					line.scale.set( s, s, s );
+					parent.add( line );
 
-            renderer = new THREE.WebGLRenderer();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+					// vertices from real points
 
-            $container.append(renderer.domElement);
-            $container.bind('selectstart', false);
+					var pgeo = THREE.GeometryUtils.clone( points );
+					var particles = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2, opacity: 0.75 } ) );
+					particles.position.set( x, y, z + 75 );
+					particles.rotation.set( rx, ry, rz );
+					particles.scale.set( s, s, s );
+					parent.add( particles );
+					// 
+					// // transparent line from equidistance sampled points
+					// 
+					// var line = new THREE.Line( spacedPoints, new THREE.LineBasicMaterial( { color: color, opacity: 0.2 } ) );
+					// line.position.set( x, y, z + 100 );
+					// line.rotation.set( rx, ry, rz );
+					// line.scale.set( s, s, s );
+					// parent.add( line );
+					// 
+					// // equidistance sampled points
+					// 
+					// var pgeo = THREE.GeometryUtils.clone( spacedPoints );
+					// var particles2 = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2, opacity: 0.5 } ) );
+					// particles2.position.set( x, y, z + 100 );
+					// particles2.rotation.set( rx, ry, rz );
+					// particles2.scale.set( s, s, s );
+					// parent.add( particles2 );
 
-            createGUI();
-            addEventListeners();
-            animate();
-        }
-        /**
-   * Sets up the event listeners so we
-   * can click and drag the cube around
-   */
-        function addEventListeners() {
+				}
 
-            /*
-     * Set up the callbacks
-     */
-            callbacks = {
+				var extrudeSettings = {	amount: 20,  bevelEnabled: true, bevelSegments: 2, steps: 2 }; // bevelSegments: 2, steps: 2 , bevelSegments: 5, bevelSize: 8, bevelThickness:5,
 
-                /**
-       * When the mouse is depressed
-       */
-                onMouseDown: function(event) {
-                    mouseDown = true;
-                    lastMouseX = event.clientX;
-                    lastMouseY = event.clientY;
-                },
+				// California
+				
+				$.getJSON('{% url jsonGPS %}', function(data) {
 
-                /**
-       * When the mouse has cheered up
-       */
-                onMouseUp: function(event) {
-                    mouseDown = false;
-                },
+	 			  $.each(data, function(key, val) {
+				    gpsLat.push(parseFloat(val.lat));
+					gpsLon.push(parseFloat(val.lon));
+				  });
+				  latMax = Math.max.apply(Math, gpsLat);
+				  latMin = Math.min.apply(Math, gpsLat);
 
-                /**
-       * When the mouse gets his boogie on
-       */
-                onMouseMove: function(event) {
+				  lonMax = Math.max.apply(Math, gpsLon);
+				  lonMin = Math.min.apply(Math, gpsLon);
 
-                    if (mouseDown) {
-                        var thisMouseX = event.clientX;
-                        var thisMouseY = event.clientY;
+				  console.log(lonMax + ' ' + lonMin);
 
-                        mesh.rotation.y += (thisMouseX - lastMouseX) * 0.01;
-                        mesh.rotation.x += (thisMouseY - lastMouseY) * 0.01;
+				  dataLoaded = true;
+				  checkForLoad();
+				});
+				
+				function checkForLoad() {
+				    if(dataLoaded) {
+				      // wait for the loading message to hide :)
+				      setTimeout(function() {
+						finalize();
+				      }, 500);
+				    }
+				  }
 
-                        lastMouseY = thisMouseY;
-                        lastMouseX = thisMouseX;
-                    }
-                },
+				// addGeometry( triangle3d, trianglePoints, triangleSpacedPoints, 			0xffee00, -180,    0, 0,     0, 0, 0, 1 );
+				// 				addGeometry( roundedRect3d, roundedRectPoints, roundedRectSpacedPoints,	0x005500, -150,  150, 0,     0, 0, 0, 1 );
+				// 				addGeometry( square3d, squarePoints, squareSpacedPoints,				0x0055ff,  150,  100, 0,     0, 0, 0, 1 );
+				// 				addGeometry( heart3d, heartPoints, heartSpacedPoints,					0xff1100,    0,  100, 0, 	 Math.PI, 0, 0, 1 );
+				// 				addGeometry( circle3d, circlePoints, circleSpacedPoints,				0x00ff11,  120,  250, 0,     0, 0, 0, 1 );
+				// 				addGeometry( fish3d, fishPoints, fishSpacedPoints,						0x222222,  -60,  200, 0,     0, 0, 0, 1 );
+				// 				addGeometry( splineShape3d, splinePoints, splineSpacedPoints,			0x888888,  -50,  -100, -50,  0, 0, 0, 0.2 );
+				// 				addGeometry( arc3d, arcPoints, arcSpacedPoints,							0xbb4422,  150,    0, 0,     0, 0, 0, 1 );
+				// 				addGeometry( smiley3d, smileyPoints, smileySpacedPoints,				0xee00ff,  -270,    250, 0,  Math.PI, 0, 0, 1 );
+				
 
-                onWindowResize: function() {
+				//
+				
+				function finalize() {
+					
+					var gpsPoints = [];
+					
+					for (var i = 0; i < gpsLat.length; i++) {
+						console.log((gpsLat[i] - latMin) * 1000)
+						gpsPoints.push(new THREE.Vector2( (gpsLat[i] - latMin) * 100000, (gpsLon[i] - lonMin) * 100000));
+					}				
 
-                    width = $container.width();
-                    height = $container.height();
-                    aspect = width / height;
+					var gpsShape = new THREE.Shape( gpsPoints );
 
-                    renderer.resize(width, height);
-                    camera.projectionMatrix.perspective(VIEW_ANGLE, aspect, NEAR, FAR);
+					var gps3D = new THREE.ExtrudeGeometry( gpsShape, { amount: 20	} );
+					var gpsPoint = gpsShape.createPointsGeometry();
+					var gpsSpacedPoints = gpsShape.createSpacedPointsGeometry( 100 );
+					
+					addGeometry( gps3D, gpsPoint, gpsSpacedPoints,	0xffaa00, 0, 0, 0,     0, 0, 0, 0.2);
+				}
+				
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-                }
-            }
+				container.appendChild( renderer.domElement );
 
-            $container.mousedown(callbacks.onMouseDown);
-            $container.mouseup(callbacks.onMouseUp);
-            $container.mousemove(callbacks.onMouseMove);
-            $(window).resize(callbacks.onWindowResize);
+				//stats = new Stats();
+				//stats.domElement.style.position = 'absolute';
+				//stats.domElement.style.top = '0px';
+				//container.appendChild( stats.domElement );
 
-        }
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
+			}
 
-        function animate() {
-            // note: three.js includes requestAnimationFrame shim
-            requestAnimationFrame(animate);
-            render();
-        }
+			//
 
-        function render() {
+			function onDocumentMouseDown( event ) {
 
-            //mesh.rotation.x += 0.01;
-            //  mesh.rotation.y += 0.02;
-            mesh.geometry.verticesNeedUpdate = true;
-            mesh.scale = {
-                'x': obj['x'],
-                'y': obj['y'],
-                'z': obj['z']
-            }
-            renderer.render(scene, camera);
+				event.preventDefault();
 
-        }
-		that.init();
-    }
-    
-})();
- </script>
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.addEventListener( 'mouseout', onDocumentMouseOut, false );
+
+				mouseXOnMouseDown = event.clientX - windowHalfX;
+				targetRotationOnMouseDown = targetRotation;
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = event.clientX - windowHalfX;
+
+				targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
+
+			}
+
+			function onDocumentMouseUp( event ) {
+
+				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+
+			}
+
+			function onDocumentMouseOut( event ) {
+
+				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+
+			}
+
+			function onDocumentTouchStart( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					event.preventDefault();
+
+					mouseXOnMouseDown = event.touches[ 0 ].pageX - windowHalfX;
+					targetRotationOnMouseDown = targetRotation;
+
+				}
+
+			}
+
+			function onDocumentTouchMove( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					event.preventDefault();
+
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
+
+				}
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				//stats.update();
+
+			}
+
+			function render() {
+
+				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
 
 
 
