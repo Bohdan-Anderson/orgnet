@@ -4,7 +4,7 @@
 
 	var container, stats, n_sub;
 	
-	var camera, scene, renderer, particles, geometry, geometry2, material, material2, line, spline, i, x, h, color, colors = [], sprite, size;
+	var camera, meshCanvas, scene, renderer, particles, geometry, geometry2, material, material2, line, spline, i, x, h, color, colors = [], sprite, size;
 	var mouseX = 0, mouseY = 0;
 
 	var windowHalfX = window.innerWidth / 2;
@@ -62,13 +62,12 @@
     		geometry = new THREE.Geometry();
     		geometry2 = new THREE.Geometry();
     		
-    		
            
             
     		for (var i = 0; i < gpsLat.length; i++) {
                 
     		    var vertex = new THREE.Vector3();
-                heartPoint =  60 + Math.sin(i+1*i*i);
+                heartPoint = 50 + Math.sin(i+1*i*i) * 5;
 			    
     			vertex.x = (gpsLat[i] - latMin) / (latMax - latMin) * 100;
     			vertex.y = (gpsLon[i] - lonMin) / (lonMax - lonMin) * 100;
@@ -85,7 +84,7 @@
     		
     		var spline = new THREE.Spline( geometry.vertices );
             
-            n_sub = 6;
+            n_sub = 8;
             
             for ( x = 0; x < gpsLat.length * n_sub; x ++ ) {
 
@@ -103,7 +102,23 @@
     		
             // transparent line from real points
             
+            var linematerialX = new THREE.LineBasicMaterial({
+                   color: 0xff0000,
+            });
+            var linematerialY = new THREE.LineBasicMaterial({
+                   color: 0x99ff00,
+            });
+            var linematerialZ = new THREE.LineBasicMaterial({
+                   color: 0x0099ff,
+            });
             
+            var lineGeometry = new THREE.Geometry();
+            lineGeometry.vertices.push(new THREE.Vector3(-10, 0, 0));
+            lineGeometry.vertices.push(new THREE.Vector3(10, 0, 0));
+            lineGeometry.vertices.push(new THREE.Vector3(10, 1, 0));
+            lineGeometry.vertices.push(new THREE.Vector3(10, -1, 0));
+            lineGeometry.vertices.push(new THREE.Vector3(10, 0, 0));
+            lineGeometry.vertices.push(new THREE.Vector3(11, 0, 0));
             
             material2 = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.5, linewidth: 1 } );
             
@@ -120,10 +135,48 @@
 
     		particles = new THREE.ParticleSystem( geometry, material );
     		particles.sortParticles = true;
-
+    		
+    		// var planes = [];
+    		var planeMaterial = new THREE.MeshBasicMaterial( { color: 0x555555, wireframe: true, opacity: 0.1 } )
+    		
+            plane = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 50, 50 ),  planeMaterial );
+            plane2 = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 50, 50 ), planeMaterial );
+            plane3 = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 50, 50 ), planeMaterial );
+            
+            var rotation = 0.0;
+            rotation = 90 * (Math.PI/180);
+            plane2.rotation.x = rotation;
+            plane3.rotation.z = rotation;
+            
+            var adjustedPosition = new THREE.Vector3(50, 50, 50);
+            
+            var lineX = new THREE.Line(lineGeometry, linematerialX);
+            var lineY = new THREE.Line(lineGeometry, linematerialY);
+            var lineZ = new THREE.Line(lineGeometry, linematerialZ);
+            
+            lineY.rotation.z = rotation; //green
+            lineZ.rotation.y = rotation; //blue
+            
+            
+            plane.position = plane2.position = plane3.position = adjustedPosition;
+            lineX.position = lineY.position = lineZ.position = new THREE.Vector3(0, 50, 0);
+            
+            
+            scene.add(lineX);
+            scene.add(lineY);
+            scene.add(lineZ);
+            
+            scene.add( plane3 );
+            scene.add( plane2 );
+            // planes.push(plane, plane2, plane3);
+            // 
+            // for (var z; z<2; z++) {
+            //                 scene.add( plane[z] );
+            //          }
+            scene.add( plane );
     		scene.add( particles );
     		scene.add( line );
-    		scene.add(spline);
+    		//scene.add( spline );
 
     		//
 
@@ -213,6 +266,7 @@
 
 		h = ( 360 * ( 1.0 + time ) % 360 ) / 360;
 		material.color.setHSV( h, 0.8, 1.0 );
+
 
 		renderer.render( scene, camera );
 
