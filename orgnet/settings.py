@@ -56,7 +56,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/Users/anyavassilieva/Sites/orgnet/collectstatic'
+STATIC_ROOT = '/Users/web/Sites/orgnet/collectstatic'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -70,7 +70,7 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 # Additional locations of static files
 STATICFILES_DIRS = (
     "/Users/and0/Sites/orgnet/static/",
-    "/Users/anyavassilieva/Sites/orgnet/static/",
+    "/Users/web/Sites/orgnet/static/",
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -109,7 +109,7 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     "/Users/and0/Sites/orgnet/templates",
-    "/Users/anyavassilieva/Sites/orgnet/templates",
+    "/Users/web/Sites/orgnet/templates",
 )
 
 INSTALLED_APPS = (
