@@ -52,10 +52,13 @@ def jsonGPS(request):
     gpsdata = get_gps_data()
     return HttpResponse(gpsdata, mimetype="application/json")
 
-def test(request):
+def terrain(request):
     obj = 'hello'
-    print 'hi'
-    return render_to_response('home.html', { 'object' : obj})
+    return render_to_response('terrain.html', { 'object' : obj})
+
+def point(request):
+    obj = 'hello'
+    return render_to_response('point.html', { 'object' : obj})
 
 def custom404(request):
     return render_to_response('404.html')

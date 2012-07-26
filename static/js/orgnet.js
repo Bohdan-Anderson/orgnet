@@ -48,7 +48,7 @@
     
         
         function finalize() {
-            
+        
 	    	container = document.createElement( 'div' );
     		document.body.appendChild( container );
 
@@ -73,6 +73,7 @@
     			vertex.y = (gpsLon[i] - lonMin) / (lonMax - lonMin) * 100;
     			vertex.z = heartPoint;
 
+                console.log('x : ' + vertex.x + ' y: '+ vertex.y + ' z: '+ vertex.z);
     			geometry.vertices.push( vertex );
 
     			colors[ i ] = new THREE.Color( 0xffffff );

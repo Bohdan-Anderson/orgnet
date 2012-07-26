@@ -6,9 +6,10 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
-    url(r'^$', 'orgnet.views.home', name='home'),
+    url(r'^$', 'orgnet.views.home'),
     # url(r'^orgbox/', include('orgbox.foo.urls')),
-    url(r'^test/', 'orgnet.views.test', name='test'),
+    url(r'^terrain/', 'orgnet.views.terrain'),
+    url(r'^point/', 'orgnet.views.point'),
     url(r'^jsonGPS/', 'orgnet.views.jsonGPS', name='jsonGPS'),
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
