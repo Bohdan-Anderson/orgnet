@@ -124,16 +124,17 @@
         plane2.rotation.x = rotation;
         plane3.rotation.z = rotation;
         
-	particles2 = new THREE.ParticleSystem(geometry, material);
-	particles2.vertices = particles.vertices;
-	particles2.position.z = 0;
+	for (var i =0; i < 10; i++) {
+	    var particles2 = new THREE.ParticleSystem(geometry, material);
+            particles2.vertices = particles.vertices;
+	    particles2.position.z = 0;
+	}
         
         scene.add( plane3 );
         scene.add( plane2 );
         scene.add( plane );
         console.log(particles);
         scene.add( particles );
-	scene.add 
         
         
         
@@ -221,7 +222,7 @@
 
 		camera.lookAt( scene.position );
 		
-		particles.position.z += 1;
+		particles.position.z += 3;
     	if (particles.position.z == 0) {
     	       	    //for (var i = 1; i< (particles.geometry.vertices.length + 1); i++) {
     	        //fallOff = zp - ((i-xp)*(i-xp))/20;
@@ -239,15 +240,15 @@
 	    
 
 
-	    zp = pointContainer[iter].z;
+	    yp = pointContainer[iter].z;
 	    //zp = 50;
     	    xp = Math.floor(pointContainer[iter].x);
-    	    yp = pointContainer[iter].y;
+    	    zp = pointContainer[iter].y;
 
-	    for (var i=0; i<particles.geometry.vertices.length;i++) {
-		particles.geometry.vertices[i].y = 0;		
+	    //for (var i=0; i<particles.geometry.vertices.length;i++) {
+		//particles.geometry.vertices[i].y = 0;		
 
-	    }
+	    //}
 	    (zp < 0) ? change = -1 : change = 1;
 	    for (var i = 1; i < (particles.geometry.vertices.length + 1); i++) {
 		
