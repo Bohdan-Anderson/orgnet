@@ -28,6 +28,8 @@
     var iter = 0;
     var thepoint = 0;
     
+    var zp, xp = 0;
+    
     var pointContainer = [];
     
 	init();
@@ -67,11 +69,12 @@
 	    for (var i = 0; i < gpsLat.length; i++) {
 
   		    var vertex = new THREE.Vector3();
-            var heartPoint = 50 + Math.sin(i+1*i*i) * 5;
+            var heartPoint = Math.sin(i+1*i*i) * 10;
 
   			vertex.x = (gpsLat[i] - latMin) / (latMax - latMin) * 100;
   			vertex.y = (gpsLon[i] - lonMin) / (lonMax - lonMin) * 100;
   			vertex.z = heartPoint;
+
   			
   			pointContainer.push(vertex);
   		}
@@ -214,43 +217,31 @@
 
 		camera.lookAt( scene.position );
 		
-		if (first) {
-		    dist = pointContainer[iter].z;
-		    speed = dist * 0.005;
-		    first = false;
-		}
-		
-		
-		if (!reverse) {
-		    for (var i = 9; i>0; i--) {
-		        speedFalloff = (i * i) * speed / 100;
-    		    particles.geometry.vertices[50 + (10 - i)].y += speedFalloff;
-                particles.geometry.vertices[50 - (10 - i)].y += speedFalloff;
-	        }
-	        particles.geometry.vertices[50].y += speed;
-		}
-		if (reverse) {
+		particles.position.z += 2;
+    	if (particles.position.z == 0) {
+    	    zp = pointContainer[iter].z;
+    	    xp = Math.floor(pointContainer[iter].x);
+    	    yp = pointContainer[iter].y;
+    	    console.log('zp ' + zp + '; xp ' + xp + '; yp ' + yp);
+    	    
+    	    particles.position.y = yp;
+    	    
+    	    particles.geometry.vertices[xp].y = zp;
+    	    for (var i = 1; i< (particles.geometry.vertices.length + 1); i++) {
+    	        fallOff = zp - ((i-xp)*(i-xp))/20;
+    	        
+    	        if (i == 1) console.log('falloff: ' + fallOff);
+    	        if (i == xp) console.log(i + ' == ' + xp + '; point: ' + fallOff + ' diff: ' + (fallOff / zp));
+                
+    	        if (particles.geometry.vertices[i-1]) particles.geometry.vertices[i-1].y = fallOff;
 
-		    for (var i = 9; i>0; i--) {
-		        speedFalloff = (i * i) * speed / 100;
-    		    particles.geometry.vertices[50 + (10 - i)].y -= speedFalloff;
-                particles.geometry.vertices[50 - (10 - i)].y -= speedFalloff;
 	        }
-	        particles.geometry.vertices[50].y -= speed;
-		}
-		
-		if (particles.geometry.vertices[50].y > topLimit) reverse = true;
-		if (particles.geometry.vertices[50].y < botLimit) reverse = false;
-		
-		particles.position.z += 1;
+	        iter ++;
+
+    	}
 		if (particles.position.z >= 50) {
-		    iter ++;
-		    dist = pointContainer[iter].z
-		    speed = dist * 0.005;
+
 		    particles.position.z = -50;
-		    
-		    
-		    console.log('dist: ' + dist + ' speed: ' + speed);
 		    
 		}
         
