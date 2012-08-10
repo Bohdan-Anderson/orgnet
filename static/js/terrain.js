@@ -4,7 +4,7 @@
 
 	var container, stats, n_sub;
 
-	var camera, meshCanvas, scene, renderer, particles, particles2, geometry, geometry2, material, material2, line, spline, i, x, h, color, colors = [], sprite, size;
+	var camera, meshCanvas, scene, renderer, particles2, geometry, geometry2, material, material2, line, spline, i, x, h, color, colors = [], sprite, size;
 	var mouseX = 0, mouseY = 0;
 
 	var windowHalfX = window.innerWidth / 2;
@@ -26,10 +26,14 @@
     var change, speed, speedFalloff = 0;
     
     var iter = 1;
+    var iterLine = 0;
+    
     var thepoint = 0;
     
     var zp, xp = 0;
     
+    var particles = []; 
+    var geometries = [];
     var pointContainer = [];
     
 	init();
@@ -74,15 +78,12 @@
   			vertex.x = (gpsLat[i] - latMin) / (latMax - latMin) * 100;
   			vertex.y = (gpsLon[i] - lonMin) / (lonMax - lonMin) * 100;
   			vertex.z = heartPoint * 10;
-			console.log(vertex.z);
   			
   			pointContainer.push(vertex);
   		}
 	  }
 	  
 	 function setup() {
-      
-
 
         createPath();
 		createGeometry();
@@ -95,24 +96,38 @@
 
   		camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 3000 );
   		camera.position.z = 100;
-
-        geometry = new THREE.Geometry();
+        
+        
+        
         
         material = new THREE.ParticleBasicMaterial( { size: 0.5} );
 		
 		
-        for (var i = -50; i<=50; i++) {
-            geometry.vertices.push(new THREE.Vector3(i, 0, 0));
+		
+
+        
+        
+        
+        
+        for (var p = 0; p < 10; p++) {
+            var geo = new THREE.Geometry();
+            geometries.push(geo);
+            for (var i = -50; i<=50; i++) {
+                geometries[p].vertices.push(new THREE.Vector3(i, 0, 0));
+            }
+            
+            var part = new THREE.ParticleSystem( geometries[p], material );
+            part.position.z = -50 + (p * 10);
+            scene.add(part);
+            particles.push(part);
         }
-        
-        particles = new THREE.ParticleSystem( geometry, material );
-        particles.position.z = -50;
+
         
         
-        
+        particles.reverse();
 		particles.sortParticles = true;
         
-        var planeMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, opacity: 0.1 } )
+        var planeMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, opacity: 0.01 } )
 		
         plane = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 50, 50 ),  planeMaterial );
         plane2 = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 50, 50 ), planeMaterial );
@@ -133,8 +148,6 @@
         scene.add( plane3 );
         scene.add( plane2 );
         scene.add( plane );
-        console.log(particles);
-        scene.add( particles );
         
         
         
@@ -222,55 +235,43 @@
 
 		camera.lookAt( scene.position );
 		
-		particles.position.z += 3;
-    	if (particles.position.z == 0) {
-    	       	    //for (var i = 1; i< (particles.geometry.vertices.length + 1); i++) {
-    	        //fallOff = zp - ((i-xp)*(i-xp))/20;
-    	        
-    	        //if (i == 1) console.log('falloff: ' + fallOff);
-    	        //if (i == xp) console.log(i + ' == ' + xp + '; point: ' + fallOff + ' diff: ' + (fallOff / zp));
-                
-    	        //if (particles.geometry.vertices[i-1]) particles.geometry.vertices[i-1].y = fallOff;
-
-	      //  }
-	        // iter ++;
-
-    	}
-	if (particles.position.z >= 50) {
-	    
-
-
-	    yp = pointContainer[iter].z;
-	    //zp = 50;
-    	    xp = Math.floor(pointContainer[iter].x);
-    	    zp = pointContainer[iter].y;
-
-	    //for (var i=0; i<particles.geometry.vertices.length;i++) {
-		//particles.geometry.vertices[i].y = 0;		
-
-	    //}
-	    (zp < 0) ? change = -1 : change = 1;
-	    for (var i = 1; i < (particles.geometry.vertices.length + 1); i++) {
-		
-	    	fallOff = zp * Math.exp(-1 * (((i-xp)*(i-xp))/100));
-		//console.log(fallOff);
-		//fallOff = fallOff/Math.sqrt(2*Math.PI*0.5);
-                if (i == xp) console.log(fallOff);
-                if (particles.geometry.vertices[i-1]) particles.geometry.vertices[i-1].y = fallOff;
-	    }
-	    //particles.geometry.vertices[xp].y = zp;
-	    particles.position.z = -50;
-	    console.log('zp ' + zp + '; xp ' + xp + '; yp ' + yp);
-    	    
-    	    //particles.position.y = yp;
-    	    
-    	    //particles.geometry.vertices[xp].y = zp;
-	    iter++;
-	
-		    		    
-	}
+		for (var pr=0; pr<10; pr++) {
+		    particles[pr].position.z += 1;
+		}
+    console.log(iterLine);
+	if (particles[iterLine].position.z > 49) {
+	          particles[iterLine].geometry.verticesNeedUpdate = true; 
+	           yp = pointContainer[iter].z;
+	           //zp = 50;
+	               xp = Math.floor(pointContainer[iter].x);
+	               zp = pointContainer[iter].y;
+	   
+	           //for (var i=0; i<particles.geometry.vertices.length;i++) {
+	           //particles.geometry.vertices[i].y = 0;
+	               
+	   
+	           //}
+	           
+	           for (var i = 1; i < (particles[iterLine].geometry.vertices.length + 1); i++) {
+	           
+	                   fallOff = zp * Math.exp(-1 * (((i-xp)*(i-xp))/100));
+	                   if (i == xp) console.log(fallOff);
+	                   particles[iterLine].geometry.vertices[i-1].y = fallOff;
+	                   console.log(particles[iterLine].geometry.vertices);
+	           }
+	           particles[iterLine].position.z = -50;
+	           
+               console.log(particles[iterLine].geometry.vertices[50].y);
+	           iter++;
+	           
+	           iterLine++;
+	           if (iter > pointContainer.length - 1) iter = 0; 
+	           if (iterLine > 9) iterLine = 0;
+	           
+	                           
+	       }
         
-
+           
 		renderer.render( scene, camera );
 
 	}
