@@ -17,7 +17,7 @@ from django.utils import simplejson
 # GPS TEST
 # 
 def get_gps_data():
-    gpx_file = open('/Users/web/Sites/orgnet/data/random.gpx', 'r')
+    gpx_file = open('/Users/web/Sites/orgnet/data/utcampus.gpx', 'r')
     gpsDict = {}
     gpsList = []
     gpx = gpxpy.parse(gpx_file)

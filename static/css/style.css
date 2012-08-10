@@ -3,9 +3,11 @@ html, body {
     padding:0;
     margin:auto;
     text-align:center;
+    background:transparent url('/static/img/orgbg.png') repeat;
 }
 
 #container {
+    
   width:100%;
   height:100%;
   position:relative;
