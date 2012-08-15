@@ -1,3 +1,5 @@
+
+
 # Django settings for orgbox project.
 
 DEBUG = True
@@ -8,6 +10,9 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
+
+import os.path
+SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 DATABASES = {
     'default': {

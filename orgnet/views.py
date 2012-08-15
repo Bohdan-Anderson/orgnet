@@ -12,12 +12,14 @@ import datetime
 from django.contrib.auth import authenticate, login
 import gpxpy
 import gpxpy.gpx
+from settings import SITE_ROOT
 from django.utils import simplejson
 
 # GPS TEST
 # 
 def get_gps_data():
-    gpx_file = open('/Users/web/Sites/orgnet/data/utcampus.gpx', 'r')
+    print SITE_ROOT
+    gpx_file = open(SITE_ROOT + '/../data/random.gpx', 'r')
     gpsDict = {}
     gpsList = []
     gpx = gpxpy.parse(gpx_file)
