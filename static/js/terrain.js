@@ -91,7 +91,7 @@
     for (var i = 0; i < gpsLat.length; i++) {
 
       var vertex = new THREE.Vector3();
-      var heartPoint = 30 * Math.sin(i/20);
+      var heartPoint = 50 * Math.sin(i/20);
 
       vertex.x = (gpsLat[i] - latMin) / (latMax - latMin) * 100;
       vertex.y = (gpsLon[i] - lonMin) / (lonMax - lonMin) * 100;
