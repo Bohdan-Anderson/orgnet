@@ -352,10 +352,10 @@
     
     if (particles[iterLine].position.z > startZ + (spacing * totalLines) -1) {
       particles[iterLine].geometry.verticesNeedUpdate = true;
-      yp = pointContainer[iter].y;
+      zp = pointContainer[iter].y;
       //zp = 50;
       xp = pointContainer[iter].x;
-      zp = pointContainer[iter].z;
+      yp = pointContainer[iter].z;
       
 	  //speed = 1 * (100/Math.abs(xp));
       particles[iterLine].rotation.z = zp/100;
