@@ -358,7 +358,7 @@
       zp = pointContainer[iter].z;
       
 	  //speed = 1 * (100/Math.abs(xp));
-      particles[iterLine].rotation.z = zp/100;
+      particles[iterLine].rotation.z = zp*zp/1000;
       
       for (var i = 1; i < (particles[iterLine].geometry.vertices.length + 1); i++) {
         fallOff = zp * Math.exp(-1 * (((i - xp) * (i - xp)) / 256));
