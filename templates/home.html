@@ -2,12 +2,16 @@
 
 {% block title %}point map{% endblock %}
 
-{% block head %}{% endblock %}
+{% block head %}<link href='http://fonts.googleapis.com/css?family=The+Girl+Next+Door' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Codystar:300' rel='stylesheet' type='text/css'>{% endblock %}
 
 
 {% block content %}
-
-<a href="/terrain/">terrain</a>
-<a href="/point/">point</a>
-
+<div id="index">
+<h1>experiments</h1>
+<ul>
+<li><a class="link" href="/terrain/"> terrain generator</a></li>
+<li><a class="link" href="/point/"> points in space</a></li>
+</ul>
+</div>
 {% endblock %}

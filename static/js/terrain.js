@@ -17,8 +17,7 @@
 
   var plane, plane2, plane3;
 
-  var topLimit = 10;
-  var botLimit = -10;
+  var startZ = 0;
 
   var change, speed, speedFalloff = 0;
 
@@ -37,10 +36,9 @@
   var lines = [];
   
   // CONFIGURABLE VARIABLES
-  var speed = 12;
-  var totalLines = 10;
+  var speed = 1;
+  var totalLines = 150;
   var spacing = 1;
-  var startZ = -50;
   
   var dotStartX = -50;
   var dots = 100;
@@ -93,7 +91,7 @@
     for (var i = 0; i < gpsLat.length; i++) {
 
       var vertex = new THREE.Vector3();
-      var heartPoint = 50 * Math.sin(i/10);
+      var heartPoint = 30 * Math.sin(i/20);
 
       vertex.x = (gpsLat[i] - latMin) / (latMax - latMin) * 100;
       vertex.y = (gpsLon[i] - lonMin) / (lonMax - lonMin) * 100;
@@ -109,13 +107,13 @@
     createGeometry();
 
   }
-
+  startZ = -(totalLines * spacing)/2;
   function createGeometry() {
     scene = new THREE.Scene();
     //scene.fog = new THREE.FogExp2( 0x000000, 0.0009 );
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 3000);
-    camera.position.z = 70;
-
+    camera.position.z = startZ + (totalLines*spacing);
+	camera.position.y = 100;
 
 
 
@@ -129,7 +127,7 @@
       opacity: 0.8,
       linewidth: 2
     });
-
+	
     for (var p = 0; p < totalLines; p++) {
       var geo = new THREE.Geometry();
       geometries.push(geo);
@@ -148,20 +146,24 @@
 
     particles.reverse();
     particles.sortParticles = true;
-
+	
     var planeMaterial = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       wireframe: true,
       opacity: 0.4
     })
-
-    plane = new THREE.Mesh(new THREE.PlaneGeometry(200, 200, 100, 100), planeMaterial);
+	
+	var planeareax = dots + 25;
+	var planeareay = totalLines*spacing + 25;
+	
+    plane = new THREE.Mesh(new THREE.PlaneGeometry(planeareax, planeareay, 100, 100 ), planeMaterial);
     //plane2 = new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 50, 50), planeMaterial);
     //plane3 = new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 50, 50), planeMaterial);
 
 
     //var rotation = 0.0;
     plane.position.y -= 0.102;
+	plane.position.z = startZ + (spacing*totalLines)/2
     //rotation = 90 * (Math.PI / 180);
     //plane2.rotation.x = rotation;
     //plane3.rotation.z = rotation;
@@ -211,10 +213,10 @@
 
     
     // STATS
-		stats = new Stats();
-		stats.domElement.style.position = 'absolute';
-		stats.domElement.style.top = '0px';
-		container.appendChild( stats.domElement );
+		//stats = new Stats();
+		//stats.domElement.style.position = 'absolute';
+		//stats.domElement.style.top = '0px';
+		//	container.appendChild( stats.domElement );
     
     
     // RENDERER
@@ -331,29 +333,32 @@
 
     render();
 
-    stats.update();
+    //stats.update();
     
     //TWEEN.update();
   }
 
   function render() {
-    //camera.position.x += (mouseX - camera.position.x) * 0.05;
-    //camera.position.y += (-mouseY - camera.position.y) * 0.05;
+    camera.position.x += (mouseX - camera.position.x) * 0.01;
+    camera.position.y += (-mouseY - camera.position.y) * 0.01;
+	//camera.position.y += 0.01;
+	//camera.position.z -= 0.02;
     
     camera.lookAt(scene.position);
-    for (var pr = 0; pr < 10; pr++) {
+    for (var pr = 0; pr < totalLines; pr++) {
       particles[pr].position.z += speed;
     }
 
     
-    if (particles[iterLine].position.z > 50) {
+    if (particles[iterLine].position.z > startZ + (spacing * totalLines) -1) {
       particles[iterLine].geometry.verticesNeedUpdate = true;
       yp = pointContainer[iter].y;
       //zp = 50;
       xp = pointContainer[iter].x;
       zp = pointContainer[iter].z;
       
-      //particles[iterLine].position.y = yp;
+	  //speed = 1 * (100/Math.abs(xp));
+      particles[iterLine].rotation.z = zp/200;
       
       for (var i = 1; i < (particles[iterLine].geometry.vertices.length + 1); i++) {
         fallOff = zp * Math.exp(-1 * (((i - xp) * (i - xp)) / 256));
