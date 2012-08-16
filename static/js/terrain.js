@@ -37,7 +37,7 @@
   
   // CONFIGURABLE VARIABLES
   var speed = 1;
-  var totalLines = 150;
+  var totalLines = 307;
   var spacing = 1;
   
   var dotStartX = -50;
@@ -85,9 +85,9 @@
       }, 100);
     }
   }
-
+	
   function createPath() {
-
+    console.log(gpsLat.length);
     for (var i = 0; i < gpsLat.length; i++) {
 
       var vertex = new THREE.Vector3();
@@ -100,6 +100,7 @@
       pointContainer.push(vertex);
     }
   }
+  
 
   function setup() {
 
@@ -120,6 +121,7 @@
     material = new THREE.ParticleBasicMaterial({
       color: 0x000000,
       size: 0.5,
+	  opacity: 0.7,
     });
 
     material2 = new THREE.LineBasicMaterial({
@@ -352,14 +354,16 @@
     
     if (particles[iterLine].position.z > startZ + (spacing * totalLines) -1) {
       particles[iterLine].geometry.verticesNeedUpdate = true;
-      zp = pointContainer[iter].y;
+      yp = pointContainer[iter].y;
       //zp = 50;
       xp = pointContainer[iter].x;
-      yp = pointContainer[iter].z;
+      zp = pointContainer[iter].z;
       
 	  //speed = 1 * (100/Math.abs(xp));
-      particles[iterLine].rotation.z = yp/100;
-      
+      particles[iterLine].rotation.z = zp/100;
+      //speed = speed * (yp/100);
+	  
+	  
       for (var i = 1; i < (particles[iterLine].geometry.vertices.length + 1); i++) {
         fallOff = zp * Math.exp(-1 * (((i - xp) * (i - xp)) / 256));
         particles[iterLine].geometry.vertices[i - 1].y = fallOff;
