@@ -354,8 +354,8 @@
   function render() {
 	
 	if (!cameraStop) {
-    	camera.position.x += (mouseX - camera.position.x) * 0.1;
-    	camera.position.y += (-mouseY - camera.position.y) * 0.1;
+    	camera.position.x += (mouseX - camera.position.x) * 0.01;
+    	camera.position.y += (-mouseY - camera.position.y) * 0.01;
 	}
 	//camera.position.y += 0.01;
 	//camera.position.z -= 0.02;
