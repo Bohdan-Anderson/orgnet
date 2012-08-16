@@ -36,7 +36,7 @@
   var geometries = [];
   var pointContainer = [];
   var lines = [];
-  
+  var speed = 0;
   // CONFIGURABLE VARIABLES
   
   var totalLines = 307;
@@ -234,7 +234,9 @@
 
   function finalize() {
 
-
+	speed = userOpts.speed;
+	
+	
     scene.add(camera);
 
 
