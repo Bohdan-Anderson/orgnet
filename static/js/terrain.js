@@ -14,12 +14,14 @@
 
   var gpsLat = [];
   var gpsLon = [];
+  var heartSet = [];
+ 
 
   var plane, plane2, plane3;
 
   var startZ = 0;
 
-  var change, speed, speedFalloff = 0;
+  var change, speedFalloff = 0;
 
   var iter = 1;
   var iterLine = 0;
@@ -36,45 +38,91 @@
   var lines = [];
   
   // CONFIGURABLE VARIABLES
-  var speed = 1;
+  
   var totalLines = 307;
   var spacing = 1;
   
   var dotStartX = -50;
   var dots = 100;
+  var dataLength = 0;
   
   var userOpts	= {
-  	range		: 800,
-  	duration	: 2500,
-  	delay		: 200,
-  	easing		: 'Elastic.EaseInOut'
+  	xdata	: 'off',
+  	ydata	: 'off',
+  	zdata	: 'off',
+	speed   : 1
   };
+  var changing = false;
   
+  var dataContainer = {'gpslat' : [], 'gpslon' : [], 'heart' : [], 'off' : []};
   
+  var dataOptions = {'gpslat' : 'gpslat', 'gpslon' : 'gpslon', 'heart' : 'heart', 'off' : 'off'};
   
   init();
 
+  function buildGui(options, callback)
+  {
+  	// collect all available easing in TWEEN library
 
+  	// the callback notified on UI change
+  	var change	= function(){
+  		//callback(options);
+		
+		callback(options);
+  	}
+	var updateCamera = function() {
+		startZ = -(totalLines * userOpts.speed)/1.5;
+		plane.position.z = startZ + (userOpts.speed*totalLines)/2;
+		camera.position.z = startZ + (totalLines*userOpts.speed) + 50;
+		plane.scale.z = userOpts.speed;
+		console.log(plane);
+		
+	}
+  	// create and initialize the UI
+  	var gui = new dat.GUI();
+  	gui.add(options, 'xdata').options(dataOptions).name('X [midpoint]')	.onChange(change);
+  	gui.add(options, 'ydata').options(dataOptions).name('Y [apex]')	.onChange(change);
+  	gui.add(options, 'zdata').options(dataOptions).name('Z [yaw]')	.onChange(change);
+	gui.add(options, 'speed', 0, 20).step(0.5).name('Speed').onChange(updateCamera);
+  }
+  
   function init() {
     //setup variables
 
     
     $.getJSON('/jsonGPS/', function(data) {
+		var h = 0;
       $.each(data, function(key, val) {
+		dataContainer['off'].push(0);  
+		dataContainer['heart'].push(50 * Math.sin(h++/20));
         gpsLat.push(parseFloat(val.lat));
         gpsLon.push(parseFloat(val.lon));
+		dataLength++;
       });
-      latMax = Math.max.apply(Math, gpsLat);
-      latMin = Math.min.apply(Math, gpsLat);
-
-      lonMax = Math.max.apply(Math, gpsLon);
-      lonMin = Math.min.apply(Math, gpsLon);
-
-
+	  
+	  
+	  dataContainer['gpslat'] = scaleData(gpsLat);
+	  dataContainer['gpslon'] = scaleData(gpsLon);
+	  
       dataLoaded = true;
       checkForLoad();
     });
 
+  }
+  
+  function scaleData(data) {
+	  
+	  var dataMax = Math.max.apply(Math, data);
+	  var dataMin = Math.min.apply(Math, data);
+	  
+	  var scaledSet = [];
+	  
+	  for (var d=0; d < data.length; d++) {
+		  scaledSet.push( ((data[d] - dataMin) / (dataMax-dataMin) * 100) -50 );
+	  }
+	  
+	  return scaledSet;
+  
   }
 
   function checkForLoad() {
@@ -87,34 +135,37 @@
   }
 	
   function createPath() {
-    console.log(gpsLat.length);
-    for (var i = 0; i < gpsLat.length; i++) {
-
+	changing = true;
+	pointContainer = [];
+    for (var i = 0; i < dataLength; i++) {
       var vertex = new THREE.Vector3();
-      var heartPoint = 50 * Math.sin(i/20);
-
-      vertex.x = (gpsLat[i] - latMin) / (latMax - latMin) * 100;
-      vertex.y = (gpsLon[i] - lonMin) / (lonMax - lonMin) * 100;
-      vertex.z = heartPoint;
-
+      vertex.x = dataContainer[userOpts['xdata']][i];
+      vertex.y = dataContainer[userOpts['ydata']][i];
+      vertex.z = dataContainer[userOpts['zdata']][i];
       pointContainer.push(vertex);
-    }
+  	}
+	
+	changing = false;
   }
   
 
   function setup() {
 
     createPath();
+	buildGui(userOpts, createPath);
     createGeometry();
 
   }
-  startZ = -(totalLines * spacing)/2;
+  
   function createGeometry() {
-    scene = new THREE.Scene();
+
+	startZ = -(totalLines * userOpts.speed)/2;
+    
+	scene = new THREE.Scene();
     //scene.fog = new THREE.FogExp2( 0x000000, 0.0009 );
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 3000);
-    camera.position.z = startZ + (totalLines*spacing);
-	camera.position.y = 100;
+    camera.position.z = startZ + (totalLines*userOpts.speed) + 25;
+	camera.position.y = 2;
 
 
 
@@ -139,7 +190,7 @@
 
       var part = new THREE.ParticleSystem( geometries[p], material );
       //var part = new THREE.Line(geometries[p], material);
-      part.position.z = startZ + (p * spacing);
+      part.position.z = startZ + (p * userOpts.speed);
       scene.add(part);
       particles.push(part);
     }
@@ -156,7 +207,7 @@
     })
 	
 	var planeareax = dots + 25;
-	var planeareay = totalLines*spacing + 25;
+	var planeareay = totalLines*userOpts.speed + 25;
 	
     plane = new THREE.Mesh(new THREE.PlaneGeometry(planeareax, planeareay, 100, 100 ), planeMaterial);
     //plane2 = new THREE.Mesh(new THREE.PlaneGeometry(100, 100, 50, 50), planeMaterial);
@@ -164,8 +215,8 @@
 
 
     //var rotation = 0.0;
-    plane.position.y -= 0.102;
-	plane.position.z = startZ + (spacing*totalLines)/2
+
+	plane.position.z = startZ + (userOpts.speed*totalLines)/2
     //rotation = 90 * (Math.PI / 180);
     //plane2.rotation.x = rotation;
     //plane3.rotation.z = rotation;
@@ -235,10 +286,6 @@
     animate();
 
   }
-  var iterate = function() {
-    if (iter > pointContainer.length -1) iter = 0; 
-    return { x: Math.floor(pointContainer[iter].x), y: pointContainer[iter++].z };  
-  }
   
 
   function onWindowResize(event) {
@@ -282,53 +329,6 @@
 
   }
 
-
-  
-  function setupTween()
-  {
-  	// 
-  	var update	= function(){
-      particles[0].geometry.verticesNeedUpdate = true;
-      //particles[iterLine].position.y = yp;
-      console.log(particles[0].geometry.vertices[50].y)
-      console.log('update');
-      for (var i = 1; i < (particles[0].geometry.vertices.length + 1); i++) {
-        fallOff = current.y * Math.exp(-1 * (((i - current.x) * (i - current.x)) / 256));
-        particles[0].geometry.vertices[i - 1].y = fallOff;
-      }
-      
-      
-  	}
- 
-
-  	var current	= { x: 0, y:0 };
-    
-
-    
-  	// remove previous tweens if needed
-  	//TWEEN.removeAll();
-	
-  	// convert the string from dat-gui into tween.js functions 
-  	//var easing	= TWEEN.Easing[userOpts.easing.split('.')[0]][userOpts.easing.split('.')[1]];
-  	// build the tween to go ahead
-  	var tweenHead	= new TWEEN.Tween(current)
-  		.to({ x: 50, y: -50 }, userOpts.duration)
-  		.onUpdate(update)
-      .onComplete();
-  	// build the tween to go backward
-  	var tweenBack	= new TWEEN.Tween(current)
-  		.to({x: 0, y:0}, userOpts.duration)
-  		.onUpdate(update)
-      .onComplete();
-    
-  	// after tweenHead do tweenBack
-  	tweenHead.chain(tweenBack);
-  	// after tweenBack do tweenHead, so it is cycling
-  	tweenBack.chain(tweenHead);
-
-  	// start the first
-  	tweenHead.start();
-  }
   function animate() {
 
     requestAnimationFrame(animate);
@@ -341,33 +341,39 @@
   }
 
   function render() {
-    camera.position.x += (mouseX - camera.position.x) * 0.01;
-    camera.position.y += (-mouseY - camera.position.y) * 0.01;
+
+    camera.position.x += (mouseX - camera.position.x) * 0.1;
+    camera.position.y += (-mouseY - camera.position.y) * 0.1;
 	//camera.position.y += 0.01;
 	//camera.position.z -= 0.02;
     
     camera.lookAt(scene.position);
     for (var pr = 0; pr < totalLines; pr++) {
-      particles[pr].position.z += speed;
+      particles[pr].position.z += userOpts.speed;
     }
-
-    
-    if (particles[iterLine].position.z > startZ + (spacing * totalLines) -1) {
-      particles[iterLine].geometry.verticesNeedUpdate = true;
-      yp = pointContainer[iter].y;
-      //zp = 50;
-      xp = pointContainer[iter].x;
-      zp = pointContainer[iter].z;
-      
-	  //speed = 1 * (100/Math.abs(xp));
-      particles[iterLine].rotation.z = zp/100;
-      //speed = speed * (yp/100);
+	particles[iterLine].geometry.verticesNeedUpdate = true;
+	
+	var limit = startZ + (userOpts.speed * totalLines);
+	
+    if (particles[iterLine].position.z > limit) {
 	  
+	  if (!changing) {
+	  yp = pointContainer[iter].y;
+	  xp = pointContainer[iter].x;
+	  xp += 50;
+	  zp = pointContainer[iter].z;
+  	  }
+	  else {
+		  yp = xp = zp = 0;
+	  }
+  
 	  
       for (var i = 1; i < (particles[iterLine].geometry.vertices.length + 1); i++) {
-        fallOff = zp * Math.exp(-1 * (((i - xp) * (i - xp)) / 256));
+        fallOff = yp * Math.exp(-1 * (((i - xp) * (i - xp)) / 256));
         particles[iterLine].geometry.vertices[i - 1].y = fallOff;
       }
+	  particles[iterLine].rotation.z = zp/100;
+      
       particles[iterLine].position.z = startZ;
 
       iter++;

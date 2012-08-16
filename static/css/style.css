@@ -22,29 +22,35 @@ position:absolute;
 
 
 .link {
+font-family: 'Waiting for the Sunrise', cursive;
 text-decoration:none;
-color:#333;
+color:#111;
+font-weight:lighter;
 position:relative;
-font-style:italic;
-z-index:99999;
+z-index:999;
 font-size:1.5em;
 }
 .link:hover {
 text-decoration:none;
-color:green;
-position:relative;
-font-style:italic;
-z-index:99999;
+color:#333;
 font-size:1.5em;
 }
 
 #index {
 font-weight:lighter;
 }
+
+.dg.ac {
+z-index:999;
+}
+.dg.ac ul li span {
+text-align:left;
+}
+
 #index ul {
 list-style-type:decimal-leading-zero;
 text-align:left;
-width:60%;
+width:55%;
 float:right;
 }
 #index ul li {
@@ -52,15 +58,15 @@ margin-left:10%;
 }
 
 #index h1 {
+color:#111;
 font-weight:lighter;
-text-shadow:-2px 2px 10px #333;
-font-family: 'Codystar', cursive;
+text-shadow:2px 2px 10px #111;
+font-family: 'Waiting for the Sunrise', cursive;
 margin-top:20%;
 text-align:right;
 float:left;
 margin-bottom:0;
-color:#111;
-width:41%;
+width:46%;
 font-size:3em;
 }
 
