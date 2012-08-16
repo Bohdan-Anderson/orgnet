@@ -70,7 +70,7 @@
 		
 		callback(options);
   	}
-	var updateCamera = function() {
+	var speedUpdate = function() {
 		startZ = -(totalLines * userOpts.speed)/1.5;
 		plane.position.z = startZ + (userOpts.speed*totalLines)/2;
 		camera.position.z = startZ + (totalLines*userOpts.speed) + 50;
@@ -78,12 +78,13 @@
 		console.log(plane);
 		
 	}
+	
   	// create and initialize the UI
   	var gui = new dat.GUI();
   	gui.add(options, 'xdata').options(dataOptions).name('X [midpoint]')	.onChange(change);
   	gui.add(options, 'ydata').options(dataOptions).name('Y [apex]')	.onChange(change);
   	gui.add(options, 'zdata').options(dataOptions).name('Z [yaw]')	.onChange(change);
-	gui.add(options, 'speed', 0, 20).step(0.5).name('Speed').onChange(updateCamera);
+	gui.add(options, 'speed', 0, 20).step(0.5).name('Speed').onChangeComplete(speedUpdate);
   }
   
   function init() {
@@ -349,11 +350,11 @@
     
     camera.lookAt(scene.position);
     for (var pr = 0; pr < totalLines; pr++) {
-      particles[pr].position.z += userOpts.speed;
+      particles[pr].position.z += speed;
     }
 	particles[iterLine].geometry.verticesNeedUpdate = true;
 	
-	var limit = startZ + (userOpts.speed * totalLines) -1;
+	var limit = startZ + (speed * totalLines) -1;
 	
     if (particles[iterLine].position.z > limit) {
 	  
