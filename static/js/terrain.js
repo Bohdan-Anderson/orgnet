@@ -83,8 +83,8 @@
   	var gui = new dat.GUI();
   	gui.add(options, 'xdata').options(dataOptions).name('X [midpoint]')	.onChange(change);
   	gui.add(options, 'ydata').options(dataOptions).name('Y [apex]')	.onChange(change);
-  	gui.add(options, 'zdata').options(dataOptions).name('Z [yaw]')	.onChange(change);
-	gui.add(options, 'speed', 0, 20).step(0.5).name('Speed').onChangeComplete(speedUpdate);
+  	gui.add(options, 'zdata').options(dataOptions).name('Z [rotate]')	.onChange(change);
+	gui.add(options, 'speed', 0, 20).step(0.5).name('Speed').onFinishChange(speedUpdate);
   }
   
   function init() {
