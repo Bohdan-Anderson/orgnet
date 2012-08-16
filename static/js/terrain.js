@@ -236,7 +236,7 @@
 
 	speed = userOpts.speed;
 	
-	
+	cameraStopBind();
     scene.add(camera);
 
 
@@ -330,6 +330,13 @@
 
     }
 
+  }
+  
+  function cameraStopBind() {
+	  $(document).click(function() {
+		  console.log('hi');
+	  };
+  
   }
 
   function animate() {
