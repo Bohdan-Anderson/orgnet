@@ -27,7 +27,7 @@
   var iterLine = 0;
 
   var thepoint = 0;
-
+  var limit;
   var zp, xp = 0;
   
   var iterate;
@@ -73,9 +73,9 @@
   	}
 	var speedUpdate = function() {
 		startZ = -(totalLines * userOpts.speed)/1.5;
-		plane.position.z = startZ + (userOpts.speed*totalLines)/2;
-		camera.position.z = startZ + (totalLines*userOpts.speed);
-		plane.scale.z = userOpts.speed;
+		plane.position.z = startZ + (totalLines)/2;
+		camera.position.z = startZ + (totalLines);
+		plane.scale.z = 1 + userOpts.speed;
 		speed = userOpts.speed;
 		
 	}
@@ -85,7 +85,7 @@
   	gui.add(options, 'xdata').options(dataOptions).name('X [midpoint]')	.onChange(change);
   	gui.add(options, 'ydata').options(dataOptions).name('Y [apex]')	.onChange(change);
   	gui.add(options, 'zdata').options(dataOptions).name('Z [rotate]')	.onChange(change);
-	gui.add(options, 'speed', 0, 20).step(0.5).name('Speed').onFinishChange(speedUpdate);
+	//gui.add(options, 'speed', 0, 1).step(1).name('Speed').onFinishChange(speedUpdate);
   }
   
   function init() {
@@ -366,7 +366,8 @@
     }
 	particles[iterLine].geometry.verticesNeedUpdate = true;
 	
-	var limit = startZ + (speed * totalLines) -1;
+	speed == 0 ? limit = startZ + (totalLines) : limit = startZ + (speed * totalLines) -1;
+	
 	
     if (particles[iterLine].position.z > limit) {
 	  
