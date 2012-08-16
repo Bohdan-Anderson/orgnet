@@ -75,7 +75,7 @@
 		plane.position.z = startZ + (userOpts.speed*totalLines)/2;
 		camera.position.z = startZ + (totalLines*userOpts.speed) + 50;
 		plane.scale.z = userOpts.speed;
-		console.log(plane);
+		speed = userOpts.speed;
 		
 	}
 	
