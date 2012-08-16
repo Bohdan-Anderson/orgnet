@@ -334,7 +334,7 @@
   }
   
   function cameraStopBind() {
-	  $(document).click(function() {
+	  $('.overlay').click(function() {
 		  cameraStop = !cameraStop;
 	  });
   
