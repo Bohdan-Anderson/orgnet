@@ -31,6 +31,7 @@
   var zp, xp = 0;
   
   var iterate;
+  var cameraStop = false;
 
   var particles = [];
   var geometries = [];
@@ -73,7 +74,7 @@
 	var speedUpdate = function() {
 		startZ = -(totalLines * userOpts.speed)/1.5;
 		plane.position.z = startZ + (userOpts.speed*totalLines)/2;
-		camera.position.z = startZ + (totalLines*userOpts.speed) + 50;
+		camera.position.z = startZ + (totalLines*userOpts.speed);
 		plane.scale.z = userOpts.speed;
 		speed = userOpts.speed;
 		
@@ -165,7 +166,7 @@
 	scene = new THREE.Scene();
     //scene.fog = new THREE.FogExp2( 0x000000, 0.0009 );
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 3000);
-    camera.position.z = startZ + (totalLines*userOpts.speed) + 25;
+    camera.position.z = startZ + (totalLines*userOpts.speed);
 	camera.position.y = 2;
 
 
@@ -334,8 +335,8 @@
   
   function cameraStopBind() {
 	  $(document).click(function() {
-		  console.log('hi');
-	  };
+		  cameraStop = !cameraStop;
+	  });
   
   }
 
@@ -351,9 +352,11 @@
   }
 
   function render() {
-
-    camera.position.x += (mouseX - camera.position.x) * 0.1;
-    camera.position.y += (-mouseY - camera.position.y) * 0.1;
+	
+	if (!cameraStop) {
+    	camera.position.x += (mouseX - camera.position.x) * 0.1;
+    	camera.position.y += (-mouseY - camera.position.y) * 0.1;
+	}
 	//camera.position.y += 0.01;
 	//camera.position.z -= 0.02;
     
