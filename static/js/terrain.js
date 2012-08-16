@@ -353,7 +353,7 @@
     }
 	particles[iterLine].geometry.verticesNeedUpdate = true;
 	
-	var limit = startZ + (userOpts.speed * totalLines);
+	var limit = startZ + (userOpts.speed * totalLines) -1;
 	
     if (particles[iterLine].position.z > limit) {
 	  
