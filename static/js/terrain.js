@@ -96,7 +96,7 @@
 		var h = 0;
       $.each(data, function(key, val) {
 		dataContainer['off'].push(0);  
-		dataContainer['heart'].push(50 * Math.sin(h++/20));
+		dataContainer['heart'].push(100 * Math.sin(h++/20));
         gpsLat.push(parseFloat(val.lat));
         gpsLon.push(parseFloat(val.lon));
 		dataLength++;
