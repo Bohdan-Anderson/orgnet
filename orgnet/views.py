@@ -15,6 +15,13 @@ import gpxpy.gpx
 from settings import SITE_ROOT
 from django.utils import simplejson
 
+#file upload
+from django.core.context_processors import csrf
+from django import forms
+from django.http import HttpResponseRedirect
+from django.shortcuts import render_to_response
+
+
 # GPS TEST
 # 
 def get_gps_data():
@@ -44,6 +51,33 @@ def get_gps_data():
     #print 'GPX:', gpx.to_xml()
     jsonData = simplejson.dumps(gpsDict)
     return jsonData
+
+
+class UploadFileForm(forms.Form):
+    title = forms.CharField(max_length=50)
+    file  = forms.FileField()
+    
+def handle_uploaded_file(f, t):
+    with open('data/%s.dat' % t, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+
+def upload_file(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            if request.user.is_authenticated(): 
+                t = request.user.username
+            else:
+                t = request.POST['title']
+            handle_uploaded_file(request.FILES['file'], t)
+            return HttpResponseRedirect('/')
+    else:
+        form = UploadFileForm()
+    c = {'form': form}
+    c.update(csrf(request))
+    return render_to_response('upload.html', c)
+
 
 def home(request, tag=None):
     obj = datetime.datetime.now

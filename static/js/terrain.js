@@ -96,7 +96,7 @@
 		var h = 0;
       $.each(data, function(key, val) {
 		dataContainer['off'].push(0);  
-		dataContainer['heart'].push(100 * Math.sin(h++/20));
+		dataContainer['heart'].push(50 * Math.sin(h++/98));
         gpsLat.push(parseFloat(val.lat));
         gpsLon.push(parseFloat(val.lon));
 		dataLength++;
@@ -171,11 +171,26 @@
 
 
 
-    material = new THREE.ParticleBasicMaterial({
+    material3 = new THREE.ParticleBasicMaterial({
       color: 0x000000,
-      size: 0.5,
+      size: 0.01,
 	  opacity: 0.7,
     });
+	
+	var PI2 = Math.PI * 2;
+	var material = new THREE.ParticleBasicMaterial( {
+
+		color: 0x333333,
+		size:0.4,
+		program: function ( context ) {
+
+			context.beginPath();
+			context.arc( 0, 0, 1, 0, PI2, true );
+			context.fill();
+
+		}
+
+	} );
 
     material2 = new THREE.LineBasicMaterial({
       color: 0x333333,
@@ -356,6 +371,11 @@
 	if (!cameraStop) {
     	camera.position.x += (mouseX - camera.position.x) * 0.01;
     	camera.position.y += (-mouseY - camera.position.y) * 0.01;
+		//camera.position.x = Math.cos(mouseX/360(2*Math.PI))*50;
+		//camera.position.y = Math.sin(mouseY/360(2*Math.PI))*10;
+		
+		//console.log(mouseX);
+		//console.log(-mouseY);
 	}
 	//camera.position.y += 0.01;
 	//camera.position.z -= 0.02;

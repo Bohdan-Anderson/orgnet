@@ -8,6 +8,8 @@ urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'orgnet.views.home'),
     # url(r'^orgbox/', include('orgbox.foo.urls')),
+    url(r'^upload/', 'orgnet.views.upload_file'),
+    url(r'^list/', 'orgnet.views.filelist'),
     url(r'^terrain/', 'orgnet.views.terrain'),
     url(r'^point/', 'orgnet.views.point'),
     url(r'^jsonGPS/', 'orgnet.views.jsonGPS', name='jsonGPS'),
