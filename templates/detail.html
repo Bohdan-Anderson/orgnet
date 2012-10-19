@@ -17,13 +17,18 @@
 
 {% block content %}
 <div id="index">
-<h1>orgnet.</h1>
+	<h1>{{object.name}} </h1>
+	<h3>{{object.date_created}}</h3>
+	<div id='detail'>
+		<div class="list">
 <ul>
-<li><a class="link" href="/upload/"> upload your data</a></li>
-<li><a class="link" href="/list/"> view uploaded</a></li>
-<!-- <li><a class="link" href="/terrain/"> terrain generator</a></li>
-<li><a class="link" href="/point/"> points in space</a></li> -->
-
+	<a href="/point/?walk={{ object.data }}"><li>Point Map</li></a>
+		<a href="/terrain/?walk={{ object.data }}"><li>Moving Terrain Map</li></a>
+			<a href="/graphs/?walk={{ object.data }}"><li>Graphs</li></a>
+				<a href="/list/"><li>Back</li></a>
 </ul>
+</div>
+</div>
+
 </div>
 {% endblock %}

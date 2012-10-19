@@ -17,13 +17,16 @@
 
 {% block content %}
 <div id="index">
-<h1>orgnet.</h1>
+	<h1>walks</h1>
+	<div class="list">
 <ul>
-<li><a class="link" href="/upload/"> upload your data</a></li>
-<li><a class="link" href="/list/"> view uploaded</a></li>
-<!-- <li><a class="link" href="/terrain/"> terrain generator</a></li>
-<li><a class="link" href="/point/"> points in space</a></li> -->
-
+	{% for obj in object %}
+	<a href="/view/{{obj.id}}/"><li><p class="name">{{ obj.name }}</p><p class="date">{{obj.date_created}}</li></a>
+	{% endfor %}
+	{% if not object %}
+	<p class="nop">None yet.</p>
+	{% endif %}
 </ul>
+</div>
 </div>
 {% endblock %}

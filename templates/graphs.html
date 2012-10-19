@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}experiments{% endblock %}
+
+{% block head %}
+<!-- LIBRARIES -->
+<script type="text/javascript" src="/static/js/lib/d3.v2.min.js"></script>
+<script type="text/javascript" src="/static/js/nv.d3.js"></script>
+<link rel="stylesheet" href="/static/css/nv.d3.css" type="text/css" />
+<!-- PERSONAL -->
+<script type="text/javascript" src="/static/js/graphs.js"></script>
+{% endblock %}
+{% block content %}
+<div id="index">
+	<h2>{{obj.name}}</h2>
+	<h3>{{obj.date_created}}</h3>
+    <div id="graphs">
+    </div>
+</div>
+{% endblock %}

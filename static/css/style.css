@@ -8,6 +8,40 @@ html, body {
 	overflow:hidden;
 }
 
+.dg {
+	position:relative;
+}
+.dg.ac div {
+	position:relative;
+	z-index:99999;
+}
+.dg.ac ul li {
+	z-index:99999;
+text-align:left;
+}
+.dg .cr.string {
+	position:relative;
+	z-index:1000000;
+}
+
+
+
+.overlay {
+  -webkit-box-align: center;
+  -webkit-box-pack: center;
+  -webkit-transition: 0.25s opacity;
+  background: -webkit-radial-gradient(rgba(127, 127, 127, 0),
+                                      rgba(127, 127, 127, 0.2) 35%,
+                                      rgba(0, 0, 0, 0.85));
+  bottom: 0;
+  display: -webkit-box;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 0;
+}
+
 #container {
     
   width:100%;
@@ -36,16 +70,91 @@ color:#333;
 font-size:1.5em;
 }
 
+
+#graphs {
+	padding:0;
+	margin:0;
+	margin-top:5em;
+	overflow:visible;
+	position:relative;
+	z-index:1000;
+}
+#graphs .chart   {
+	width:90%;
+	margin-top:0;
+	margin-bottom:0;
+	position:relative;
+	overflow:visible;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+#graphs .chart h5 {
+	position:absolute;
+	right:1.5em;
+	top:-2em;
+	text-align:left;
+	font-weight:normal;
+	text-transform:uppercase;
+	font-size:1.5em;
+}
+
+
+svg {
+	margin-left:-40px;
+	position:relative;
+	padding:20px;
+	height:200px;
+	padding-bottom:0;
+	margin-bottom:0;
+	overflow:visible;
+	z-index:999;
+}
+
 #index {
 font-weight:lighter;
 }
 
-.dg.ac {
-z-index:999;
+
+.list ul li {
+	position:relative;
+	z-index:99999;
 }
-.dg.ac ul li span {
-text-align:left;
+
+
+
+#upload p {
+	position:relative;
+	margin-bottom:2em;
 }
+#upload form p label {
+	left:-103%;
+	width:100%;
+	text-align:right;
+
+	font-size:1em;
+	position:absolute;
+}
+#upload form #id_your_Name {
+	height:1.5em;
+}
+
+#upload form #id_data {
+	
+	font-size:1em;
+	color:#666;
+	
+	font-weight:lighter;
+	text-align:left;
+
+}
+#upload form #Save {
+	
+	font-size:1em;
+	text-align:left;
+
+}
+
 
 #index ul {
 padding:0;
@@ -60,6 +169,7 @@ float:right;
 margin-left:5%;
 }
 
+
 #index h1 {
 color:#111;
 font-weight:lighter;
@@ -68,26 +178,13 @@ font-family: 'Quantico', sans-serif;
 margin-top:20%;
 text-align:right;
 float:left;
+margin-right:20%;
 margin-bottom:0;
-width:46%;
+width:40%;
 font-size:3em;
 }
 
-.overlay {
-  -webkit-box-align: center;
-  -webkit-box-pack: center;
-  -webkit-transition: 0.25s opacity;
-  background: -webkit-radial-gradient(rgba(127, 127, 127, 0),
-                                      rgba(127, 127, 127, 0.2) 35%,
-                                      rgba(0, 0, 0, 0.85));
-  bottom: 0;
-  display: -webkit-box;
-  left: 0;
-  position: fixed;
-  right: 0;
-  top: 0;
-  z-index: 10;
-}
+
 #upload {
 	margin-top:20%;
 	z-index:999;
